@@ -5,6 +5,7 @@ library(ggplot2)
 library(ggplotAssist)
 library(shiny)
 library(shinythemes)
+library(gamlss)
 
 #Open file####
 #68 lineas inservibles 
@@ -97,6 +98,13 @@ shinyServer(function(input, output) {
     
     
     
+  })
+  
+  
+  
+  output$pdfview <- renderUI({
+    
+    tags$iframe(width = "560", height = "315",url_link = "https://www.youtube.com/embed/0fKg7e37bQE")
   })
   
 })

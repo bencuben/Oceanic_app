@@ -4,6 +4,7 @@ library(ggplot2)
 library(ggplotAssist)
 library(shiny)
 library(shinythemes)
+library(gamlss)
 # Define UI for application that draws a histogram
 shinyUI(
   
@@ -13,7 +14,7 @@ shinyUI(
                       fluidPage(theme=shinytheme("cerulean"),
                         
                         sidebarLayout(
-                          sidebarPanel(
+                          sidebarPanel(width=4,
                             fluidRow(
                               column(7,img(src="escudo.png", height="100%", width="100%")),
                               column(4,tags$p(tags$p(""),align="left"))
@@ -46,7 +47,7 @@ shinyUI(
                                                    selected = ",")
                               ),
                               #Pregunta el tipo de decimal usado en los datos
-                              column(5,selectInput("dec","Decimal",width = "100%",
+                              column(5,selectInput("dec","Decimal",width = "100%", 
                                                    choices = c("Punto"=".",
                                                                "Coma"=","),
                                                    selected=",")
@@ -58,15 +59,28 @@ shinyUI(
                           
                           # Show a plot of the generated distribution
                           mainPanel(
-                            plotOutput("plot1"),
-                            plotOutput("plot2")
+                            fluidRow(
+                              column(6,
+                            plotOutput("plot1",height = "300px")
+                              ),
+                            column(6,
+                            plotOutput("plot2",height = "300px")
+                            )
+                              
+                            )
+                            
+                            
+                            
                           )
                         )
                       )
                       
              ),#tab 1
-             tabPanel(title="descriotivo",icon = icon("chart-line","fa-1x"),
-                      tags$p("asdasdasdasdasd")
+             tabPanel(title="Información",icon = icon("info-circle","fa-1x"),
+                      tags$p("asdasdasdasdasd"),
+                      
+                      uiOutput("pdfview")
+                      
              )#tab 2
   )#NAVBAR
   
