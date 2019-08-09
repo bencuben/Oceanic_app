@@ -66,10 +66,12 @@ shinyServer(function(input, output) {
     
     Ajuste <- fitDist(y = datos2, type = "realplus")
     
+    output$plot3<- renderPlot({
     histDist(datos2, family=as.name(Ajuste$family[1]), col.hist = "white", 
              col.main = "Black", line.col = "blue",border.hist = "black",
              main= paste("Family:",Ajuste$family[2]), xlab="Datos",ylab="Densidad",
              col.axis = "black", col.lab = "black")
+    })
     #eval = Evalua expresiones
     #parse = convierte textos en expresiones sin evaluar
     #paste0 = concatena textos sin espacios
@@ -100,6 +102,24 @@ shinyServer(function(input, output) {
     
   })
   
+  
+  output$plot4<- renderPlot({
+    
+    #Means Year and Month####
+    MY <- datos1 %>% group_by(Year) %>% summarise(medias = mean(SSH))
+    MM <- datos1 %>% group_by(Month) %>% summarise(medias = mean(SSH))
+    
+    ggplot(data = MY, aes(x=Year, y=medias)) + 
+      geom_boxplot(data = datos1,aes(x=Year,y=SSH,group=Year), 
+                   fill = "#aee7e8", outlier.color = "#24009c") +
+      scale_y_continuous(name = "Height") + 
+      scale_x_continuous(name = "Year", breaks = seq(min(MY$Year),max(MY$Year),1)) + 
+      labs(tag = "Sea surface height") + 
+      theme(plot.tag = element_text(lineheight = 2,face = "bold",size = 20),
+            plot.tag.position = "top")  +
+      geom_point(color = "#c72c41") + geom_line(color = "#c72c41")
+    
+  })
   
   
   output$pdfview <- renderUI({

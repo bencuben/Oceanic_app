@@ -61,10 +61,12 @@ shinyUI(
                           mainPanel(
                             fluidRow(
                               column(6,
-                            plotOutput("plot1",height = "300px")
+                            plotOutput("plot1",height = "300px"),
+                            plotOutput("plot4",height = "300px")
                               ),
                             column(6,
-                            plotOutput("plot2",height = "300px")
+                            plotOutput("plot2",height = "300px"),
+                            plotOutput("plot3",height = "300px")
                             )
                               
                             )
