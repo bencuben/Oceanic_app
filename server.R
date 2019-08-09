@@ -122,9 +122,9 @@ shinyServer(function(input, output) {
   })
   
   
-  output$pdfview <- renderUI({
-    
-    tags$iframe(width = "560", height = "315",url_link = "https://www.youtube.com/embed/0fKg7e37bQE")
-  })
+  # output$pdfview <- renderUI({
+  #   
+  #   tags$iframe(width = "560", height = "315",url_link = "https://www.youtube.com/embed/0fKg7e37bQE")
+  # })
   
 })
