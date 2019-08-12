@@ -33,9 +33,9 @@ shinyServer(function(input, output) {
 
   
   plotInput1 <- reactive({
-    titulo <- ifelse(input$titulo1=="","Sea surface height",input$titulo1)
-    ejex <- ifelse(input$ejex1=="","Month",input$ejex1)
-    ejey <- ifelse(input$ejey1=="","Height",input$ejey1)
+    titulo <- ifelse(input$titulo1=="","Ciclo Mensual",input$titulo1)
+    ejex <- ifelse(input$ejex1=="","Mes",input$ejex1)
+    ejey <- ifelse(input$ejey1=="","Altura",input$ejey1)
     
     
     ggplot(data = MM, aes(x=Month, y=medias)) + 
@@ -73,7 +73,7 @@ shinyServer(function(input, output) {
   Quant <- data.frame(Probs=seq(0,1,0.0001),
                       Cuantil_P=quantile(datos2,probs = seq(0,1,0.0001)))
   
-  Ajuste <- fitDist(y = datos2, type = "realplus")
+  Ajuste <- fitDist(y = datos2, type = "realplus",trace=FALSE)
   
   #output$plot2 <- renderPlot({
     
@@ -97,13 +97,13 @@ shinyServer(function(input, output) {
     d_0.95 <- round(Quant$Cuantil_P[9501],2)
     d_0.99 <- round(Quant$Cuantil_P[9901],2)
     
-    titulo2 <- ifelse(input$titulo2=="",paste("Data VS",Ajuste$family[2]),input$titulo2)
-    ejex2 <- ifelse(input$ejex2=="","X",input$ejex2)
-    ejey2 <- ifelse(input$ejey2=="","Probability",input$ejey2)
+    titulo2 <- ifelse(input$titulo2=="",paste("Análisis de extremos: ",Ajuste$family[2]),input$titulo2)
+    ejex2 <- ifelse(input$ejex2=="","Datos",input$ejex2)
+    ejey2 <- ifelse(input$ejey2=="","Probabilidad acumulada",input$ejey2)
     
-    ggplot(data = Quant) + 
+    ggplot(data = Quant) +
       geom_line(aes(x=Cuantil_P,y=Probs), color = "#FF9770", size=1) +
-      geom_line(aes(x=Cuantil_T,y=Probs), color = "#70D6FF", size=1) + 
+      geom_line(aes(x=Cuantil_T,y=Probs), color = "#70D6FF", size=1) +
       scale_x_continuous(name = ejex2,breaks = seq(0,ceiling(max(datos2)),5)) +
       scale_y_continuous(name = ejey2) +
       labs(tag = titulo2) +
@@ -114,11 +114,11 @@ shinyServer(function(input, output) {
       geom_text(aes(x=d_0.05,y=0.05),label=d_0.05)+
       geom_text(aes(x=d_0.95,y=0.95),label=d_0.95)+
       geom_text(aes(x=d_0.99,y=0.99),label=d_0.99)
-    
+
     
     
   #})
-   # plotInput2()
+    #plot(datos2)
     
   })
   
@@ -140,16 +140,17 @@ shinyServer(function(input, output) {
   
   plotInput3 <- reactive({
   #output$plot3<- renderPlot({
-    titulo3 <- ifelse(input$titulo3=="",paste("Family:",Ajuste$family[2]),input$titulo3)
-    ejex3 <- ifelse(input$ejex3=="","Datos",input$ejex3)
-    ejey3 <- ifelse(input$ejey3=="","Densidad",input$ejey3)
+  titulo3 <- ifelse(input$titulo3=="",paste("Mejor distribución: :",Ajuste$family[2]),input$titulo3)
+  ejex3 <- ifelse(input$ejex3=="","Datos",input$ejex3)
+  ejey3 <- ifelse(input$ejey3=="","Densidad",input$ejey3)
+
+  histDist(datos2, family=as.name(Ajuste$family[1]), col.hist = "white",
+           col.main = "Black", line.col = "blue",border.hist = "black",
+           main= titulo3,
+           xlab=ejex3,
+           ylab=ejey3,
+           col.axis = "black", col.lab = "black")
     
-    histDist(datos2, family=as.name(Ajuste$family[1]), col.hist = "white", 
-             col.main = "Black", line.col = "blue",border.hist = "black",
-             main= titulo3,
-             xlab=ejex3,
-             ylab=ejey3,
-             col.axis = "black", col.lab = "black")
   })  
   
   output$plot3<- renderPlot({
@@ -175,9 +176,9 @@ shinyServer(function(input, output) {
     MY <- datos1 %>% group_by(Year) %>% summarise(medias = mean(SSH))
     MM <- datos1 %>% group_by(Month) %>% summarise(medias = mean(SSH))
     
-    titulo4 <- ifelse(input$titulo4=="","Sea surface height",input$titulo4)
-    ejex4 <- ifelse(input$ejex4=="","Year",input$ejex4)
-    ejey4 <- ifelse(input$ejey4=="","Height",input$ejey4)
+    titulo4 <- ifelse(input$titulo4=="","Ciclo anual",input$titulo4)
+    ejex4 <- ifelse(input$ejex4=="","Año",input$ejex4)
+    ejey4 <- ifelse(input$ejey4=="","Altura",input$ejey4)
     
     ggplot(data = MY, aes(x=Year, y=medias)) + 
       geom_boxplot(data = datos1,aes(x=Year,y=SSH,group=Year), 

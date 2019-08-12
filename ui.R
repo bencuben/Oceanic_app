@@ -90,19 +90,19 @@ shinyUI(
                               tags$h3("Opciones de la gráfica"),
                               tags$br(),
                               tags$p("Ingrese título del gráfico"),
-                              textInput("titulo2",label=NULL),
+                              textInput("titulo4",label=NULL),
                               tags$p("Ingrese el nombre del eje Y"),
-                              textInput("ejey2",label=NULL),
+                              textInput("ejey4",label=NULL),
                               tags$p("Ingrese el nombre del eje X"),
-                              textInput("ejex2",label=NULL),
-                              downloadButton('downloadPlot2', 'Download Plot'),
+                              textInput("ejex4",label=NULL),
+                              downloadButton('downloadPlot4', 'Download Plot'),
                               
                               circle = TRUE, status = "info",
                               icon = icon("gear"), width = "300px",
                               
                               tooltip = tooltipOptions(title = "Click para más!")
                             ),
-                            plotOutput("plot2"),
+                            plotOutput("plot4"),
                             
                             #Gráfica 3------------------------------------------------
                             dropdownButton(
@@ -123,25 +123,29 @@ shinyUI(
                               tooltip = tooltipOptions(title = "Click para más!")
                             ),
                             plotOutput("plot3"),
-                            #Gráfica 4------------------------------------------------
+                            
+
+                            # Gráfica 4------------------------------------------------- --------------
+
                             dropdownButton(
                               
                               tags$h3("Opciones de la gráfica"),
                               tags$br(),
                               tags$p("Ingrese título del gráfico"),
-                              textInput("titulo4",label=NULL),
+                              textInput("titulo2",label=NULL),
                               tags$p("Ingrese el nombre del eje Y"),
-                              textInput("ejey4",label=NULL),
+                              textInput("ejey2",label=NULL),
                               tags$p("Ingrese el nombre del eje X"),
-                              textInput("ejex4",label=NULL),
-                              downloadButton('downloadPlot4', 'Download Plot'),
+                              textInput("ejex2",label=NULL),
+                              downloadButton('downloadPlot2', 'Download Plot'),
                               
                               circle = TRUE, status = "info",
                               icon = icon("gear"), width = "300px",
                               
                               tooltip = tooltipOptions(title = "Click para más!")
                             ),
-                            plotOutput("plot4")
+                            plotOutput("plot2")
+                            
                             
                               
                             
