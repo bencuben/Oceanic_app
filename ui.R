@@ -6,7 +6,6 @@ library(shiny)
 library(shinythemes)
 library(gamlss)
 library(shinyWidgets)
-# Define UI for application that draws a histogram
 shinyUI(
   
   
@@ -19,24 +18,25 @@ shinyUI(
                         sidebarLayout(
                           sidebarPanel(width=4,
                             fluidRow(
-                              column(7,img(src="escudo.png", height="100%", width="100%")),
-                              column(4,tags$p(tags$p(""),align="left"))
+                              column(7,img(src="escudo.png", height="100%", width="100%"))#,
+                              #column(4,tags$p(tags$p(""),align="left"))
                             ),
                             
                             
                             fileInput("file1", "Carga tu base de datos",
+                                      placeholder = "Datos...",
+                                      buttonLabel = "Explorar...",
                                       multiple = FALSE,
                                       accept = c("text/csv",
                                                  "text/comma-separated-values,text/plain",
-                                                 ".csv")#,
-                                      #buttonLabel = "Explorar...",
-                                      #placeholder = "Ningún archivo"
+                                                 ".csv")
+                                      
                             ),
                             #Pregunta si los datos tienen encabezado o no
                             
                             tags$p("¿La base de datos tiene encabezado?"),
                             
-                            checkboxInput("header", "Encabezado", FALSE),
+                            checkboxInput("header", "Encabezado", TRUE),
                             
                             #Dos opciones en una sola fila
                             
@@ -60,19 +60,91 @@ shinyUI(
                             
                           ),
                           
-                          # Show a plot of the generated distribution
+                          # Paneles de salida
                           mainPanel(
-                            fluidRow(
-                              column(6,
-                            plotOutput("plot1",height = "300px"),
-                            plotOutput("plot4",height = "300px")
-                              ),
-                            column(6,
-                            plotOutput("plot2",height = "300px"),
-                            plotOutput("plot3",height = "300px")
-                            )
+                            #Gráfica 1------------------------------------------------
+                            dropdownButton(
                               
-                            )
+                              tags$h3("Opciones de la gráfica"),
+                              tags$br(),
+                              tags$p("Ingrese título del gráfico"),
+                              textInput("titulo1",label=NULL),
+                              tags$p("Ingrese el nombre del eje Y"),
+                              textInput("ejey1",label=NULL),
+                              tags$p("Ingrese el nombre del eje X"),
+                              textInput("ejex1",label=NULL),
+                              downloadButton('downloadPlot1', 'Download Plot'),
+                              
+                              circle = TRUE, status = "info",
+                              icon = icon("gear"), width = "300px",
+                              
+                              tooltip = tooltipOptions(title = "Click para más!")
+                            ),
+                            
+                            
+                            plotOutput("plot1"),
+                            
+                            #Gráfica 2------------------------------------------------
+                            dropdownButton(
+                              
+                              tags$h3("Opciones de la gráfica"),
+                              tags$br(),
+                              tags$p("Ingrese título del gráfico"),
+                              textInput("titulo2",label=NULL),
+                              tags$p("Ingrese el nombre del eje Y"),
+                              textInput("ejey2",label=NULL),
+                              tags$p("Ingrese el nombre del eje X"),
+                              textInput("ejex2",label=NULL),
+                              downloadButton('downloadPlot2', 'Download Plot'),
+                              
+                              circle = TRUE, status = "info",
+                              icon = icon("gear"), width = "300px",
+                              
+                              tooltip = tooltipOptions(title = "Click para más!")
+                            ),
+                            plotOutput("plot2"),
+                            
+                            #Gráfica 3------------------------------------------------
+                            dropdownButton(
+                              
+                              tags$h3("Opciones de la gráfica"),
+                              tags$br(),
+                              tags$p("Ingrese título del gráfico"),
+                              textInput("titulo3",label=NULL),
+                              tags$p("Ingrese el nombre del eje Y"),
+                              textInput("ejey3",label=NULL),
+                              tags$p("Ingrese el nombre del eje X"),
+                              textInput("ejex3",label=NULL),
+                              downloadButton('downloadPlot3', 'Download Plot'),
+                              
+                              circle = TRUE, status = "info",
+                              icon = icon("gear"), width = "300px",
+                              
+                              tooltip = tooltipOptions(title = "Click para más!")
+                            ),
+                            plotOutput("plot3"),
+                            #Gráfica 4------------------------------------------------
+                            dropdownButton(
+                              
+                              tags$h3("Opciones de la gráfica"),
+                              tags$br(),
+                              tags$p("Ingrese título del gráfico"),
+                              textInput("titulo4",label=NULL),
+                              tags$p("Ingrese el nombre del eje Y"),
+                              textInput("ejey4",label=NULL),
+                              tags$p("Ingrese el nombre del eje X"),
+                              textInput("ejex4",label=NULL),
+                              downloadButton('downloadPlot4', 'Download Plot'),
+                              
+                              circle = TRUE, status = "info",
+                              icon = icon("gear"), width = "300px",
+                              
+                              tooltip = tooltipOptions(title = "Click para más!")
+                            ),
+                            plotOutput("plot4")
+                            
+                              
+                            
                             
                             
                             
