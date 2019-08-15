@@ -7,39 +7,144 @@ library(shiny)
 library(shinythemes)
 library(gamlss)
 
-#Open file####
-#68 lineas inservibles 
-datos <- read.table("www/AirSea_ST_0001.asc", skip = 68,header = T)
-#Fix the base####
-datos1 <- datos[datos$SSH != -99,c("YYYYMM","SSH")]
-datos1$YYYYMM <- ymd(datos1$YYYYMM,truncated = 2)
-datos1$Month <- month(datos1$YYYYMM)
-datos1$Year <- year(datos1$YYYYMM)
-datos1 <- datos1[,c("Year","Month","SSH")]
-#Means Year and Month####
-MY <- datos1 %>% group_by(Year) %>% summarise(medias = mean(SSH))
-MM <- datos1 %>% group_by(Month) %>% summarise(medias = mean(SSH))
+# #Open file####
+# #68 lineas inservibles 
+# datos <- read.table("www/AirSea_ST_0001.asc", skip = 68,header = T)
+# #Fix the base####
+# datos1 <- datos[datos$SSH != -99,c("YYYYMM","SSH")]
+# datos1$YYYYMM <- ymd(datos1$YYYYMM,truncated = 2)
+# datos1$Month <- month(datos1$YYYYMM)
+# datos1$Year <- year(datos1$YYYYMM)
+# datos1 <- datos1[,c("Year","Month","SSH")]
+# #Means Year and Month####
+# MY <- datos1 %>% group_by(Year) %>% summarise(medias = mean(SSH))
+# MM <- datos1 %>% group_by(Month) %>% summarise(medias = mean(SSH))
+# 
+# 
+# datos2 <- datos[datos$SSH != -99,c("SSH")]
 
 
-datos2 <- datos[datos$SSH != -99,c("SSH")]
+
+
+
+
 
 
 # Define server logic required to draw a histogram
-shinyServer(function(input, output) {
+shinyServer(function(input, output,session) {
    
+
+# Datos -------------------------------------------------------------------
+
+  #Definición de la lectura de datos reactiva
+  dataset <- reactive({
+    #Pregunta si la base ha sido cargada para poder continuar
+    
+    req(input$file1)
+    #Lectura de la base en txt
+    datos<-read.table(input$file1$datapath,
+             header = input$header)#,
+             #sep = input$sep,dec = input$dec)
+    
+    datos
+    
+  })
+  
+    
+  reactive({
+    if(input$accion==TRUE){
+      datos<-dataset()
+      datos1 <- datos[datos[,input$ycol] != -99,c(input$xcol,input$ycol)]
+      datos1$YYYYMM <- ymd(datos1[,input$xcol],truncated = 2)
+      
+      datos1$Month <- month(datos1[,input$xcol])
+      datos1$Year <- year(datos1[,input$xcol])
+      datos1$Y<-datos1[,input$ycol]
+      datos1 <- datos1[,c("Year","Month","Y")]
+      #Means Year and Month####
+      MY <- datos1 %>% group_by(Year) %>% summarise(medias = mean(Y) )
+      MM <- datos1 %>% group_by(Month) %>% summarise(medias = mean(Y))
+      
+      
+      datos2 <- datos[datos[,input$ycol] != -99,input$ycol]
+      
+      Quant <- data.frame(Probs=seq(0,1,0.0001),
+                          Cuantil_P=quantile(datos2,probs = seq(0,1,0.0001)))
+      
+      Ajuste <- fitDist(y = datos2, type = "realplus",trace=FALSE)
+      
+    }
+    
+  })
+ 
+  
+  output$contents <- renderTable({
+    
+    head(dataset())[,1:9] 
+  })
   
 
+  #Actualiza los menus desplegables
+  observeEvent(dataset(), {
+    updateSelectInput(session, "xcol", choices=colnames(dataset()))
+    updateSelectInput(session, "ycol", choices=colnames(dataset()))
+  })
+  
+  
+  
+  
+  
+  #Número de columnas de los datos, la cual servira para los paneles condicionales
+  output$datos <- reactive({
+    if(is.null(input$file1)){
+      TRUE
+    }else{
+      FALSE
+    }
+    #is.null(dataset())
+
+  })
+  
+  
+  #Argumento para poder usar los outputs en las condiciones de los paneles
+   outputOptions(output, "datos", suspendWhenHidden = FALSE) 
+   
+   
+   
+   
 # Gráfico 1 ---------------------------------------------------------------
 
   
   plotInput1 <- reactive({
+    req(input$file1)
+    if(input$accion==TRUE){
+      
+      
+      datos<-dataset()
+      datos1 <- datos[datos[,input$ycol] != -99,c(input$xcol,input$ycol)]
+      datos1$YYYYMM <- ymd(datos1[,input$xcol],truncated = 2)
+      
+      datos1$Month <- month(datos1[,input$xcol])
+      datos1$Year <- year(datos1[,input$xcol])
+      datos1$Y<-datos1[,input$ycol]
+      datos1 <- datos1[,c("Year","Month","Y")]
+      #Means Year and Month####
+      MY <- datos1 %>% group_by(Year) %>% summarise(medias = mean(Y) )
+      MM <- datos1 %>% group_by(Month) %>% summarise(medias = mean(Y))
+      
+      
+      
+      
+      
+      
+      
     titulo <- ifelse(input$titulo1=="","Ciclo Mensual",input$titulo1)
     ejex <- ifelse(input$ejex1=="","Mes",input$ejex1)
     ejey <- ifelse(input$ejey1=="","Altura",input$ejey1)
     
     
     ggplot(data = MM, aes(x=Month, y=medias)) + 
-      geom_boxplot(data = datos1,aes(x=Month,y=SSH,group=Month), 
+      geom_boxplot(data = datos1,aes(x=Month,y=Y,group=Month), 
                    fill = "#aee7e8", outlier.color = "#24009c") + 
       scale_y_continuous(name = ejey) + 
       scale_x_continuous(name = ejex, breaks = 1:12 , labels = 
@@ -49,6 +154,7 @@ shinyServer(function(input, output) {
       theme(plot.tag = element_text(lineheight = 2,face = "bold",size = 20),
             plot.tag.position = "top")  +
       geom_point(color = "#c72c41")  + geom_line(color = "#c72c41")
+    }
     
   })
   
@@ -70,20 +176,29 @@ shinyServer(function(input, output) {
 
 # Gráfico 2 ---------------------------------------------------------------
 
-  Quant <- data.frame(Probs=seq(0,1,0.0001),
-                      Cuantil_P=quantile(datos2,probs = seq(0,1,0.0001)))
+
   
-  Ajuste <- fitDist(y = datos2, type = "realplus",trace=FALSE)
   
-  #output$plot2 <- renderPlot({
     
   plotInput2 <- reactive({
+    req(input$file1)
     
-    #Data analysis####
+    if(input$accion==TRUE){
+    
+      datos<-dataset()
+      
+      
+      datos2 <- datos[datos[,input$ycol] != -99,input$ycol]
+      
+      Quant <- data.frame(Probs=seq(0,1,0.0001),
+                          Cuantil_P=quantile(datos2,probs = seq(0,1,0.0001)))
+      
+      Ajuste <- fitDist(y = datos2, type = "realplus",trace=FALSE)
+      
     
     
-    
-    
+      
+      
     #eval = Evalua expresiones
     #parse = convierte textos en expresiones sin evaluar
     #paste0 = concatena textos sin espacios
@@ -91,7 +206,7 @@ shinyServer(function(input, output) {
                                                 "(p=seq(0,1,0.0001),mu=",
                                                 Ajuste$mu,
                                                 ",sigma=",Ajuste$sigma,")")))
-    #Graphic####
+    
     d_0.01 <- round(Quant$Cuantil_P[101],2)
     d_0.05 <- round(Quant$Cuantil_P[501],2)
     d_0.95 <- round(Quant$Cuantil_P[9501],2)
@@ -115,7 +230,7 @@ shinyServer(function(input, output) {
       geom_text(aes(x=d_0.95,y=0.95),label=d_0.95)+
       geom_text(aes(x=d_0.99,y=0.99),label=d_0.99)
 
-    
+    }
     
   #})
     #plot(datos2)
@@ -139,7 +254,22 @@ shinyServer(function(input, output) {
 # Gráfico 3 ---------------------------------------------------------------
   
   plotInput3 <- reactive({
-  #output$plot3<- renderPlot({
+    req(input$file1)
+    if(input$accion==TRUE){
+      
+      datos<-dataset()
+      
+      
+      
+      datos2 <- datos[datos[,input$ycol] != -99,input$ycol]
+      
+      Quant <- data.frame(Probs=seq(0,1,0.0001),
+                          Cuantil_P=quantile(datos2,probs = seq(0,1,0.0001)))
+      
+      Ajuste <- fitDist(y = datos2, type = "realplus",trace=FALSE)
+      
+      
+      
   titulo3 <- ifelse(input$titulo3=="",paste("Mejor distribución: :",Ajuste$family[2]),input$titulo3)
   ejex3 <- ifelse(input$ejex3=="","Datos",input$ejex3)
   ejey3 <- ifelse(input$ejey3=="","Densidad",input$ejey3)
@@ -150,7 +280,7 @@ shinyServer(function(input, output) {
            xlab=ejex3,
            ylab=ejey3,
            col.axis = "black", col.lab = "black")
-    
+    }
   })  
   
   output$plot3<- renderPlot({
@@ -170,18 +300,30 @@ shinyServer(function(input, output) {
 
   
   plotInput4 <- reactive({
-  #output$plot4<- renderPlot({
+    req(input$file1)
+    if(input$accion==TRUE){
     
-    #Means Year and Month####
-    MY <- datos1 %>% group_by(Year) %>% summarise(medias = mean(SSH))
-    MM <- datos1 %>% group_by(Month) %>% summarise(medias = mean(SSH))
+      
+      datos<-dataset()
+      datos1 <- datos[datos[,input$ycol] != -99,c(input$xcol,input$ycol)]
+      datos1$YYYYMM <- ymd(datos1[,input$xcol],truncated = 2)
+      
+      datos1$Month <- month(datos1[,input$xcol])
+      datos1$Year <- year(datos1[,input$xcol])
+      datos1$Y<-datos1[,input$ycol]
+      datos1 <- datos1[,c("Year","Month","Y")]
+      #Means Year and Month####
+      MY <- datos1 %>% group_by(Year) %>% summarise(medias = mean(Y) )
+      MM <- datos1 %>% group_by(Month) %>% summarise(medias = mean(Y))
+      
+      
     
     titulo4 <- ifelse(input$titulo4=="","Ciclo anual",input$titulo4)
     ejex4 <- ifelse(input$ejex4=="","Año",input$ejex4)
     ejey4 <- ifelse(input$ejey4=="","Altura",input$ejey4)
     
     ggplot(data = MY, aes(x=Year, y=medias)) + 
-      geom_boxplot(data = datos1,aes(x=Year,y=SSH,group=Year), 
+      geom_boxplot(data = datos1,aes(x=Year,y=Y,group=Year), 
                    fill = "#aee7e8", outlier.color = "#24009c") +
       scale_y_continuous(name = ejey4) + 
       scale_x_continuous(name = ejex4, breaks = seq(min(MY$Year),max(MY$Year),1)) + 
@@ -189,7 +331,7 @@ shinyServer(function(input, output) {
       theme(plot.tag = element_text(lineheight = 2,face = "bold",size = 20),
             plot.tag.position = "top")  +
       geom_point(color = "#c72c41") + geom_line(color = "#c72c41")
-    
+    }
   })
   
   output$plot4<- renderPlot({

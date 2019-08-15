@@ -32,36 +32,71 @@ shinyUI(
                                                  ".csv")
                                       
                             ),
+                            tags$p("Recuerde que de la correcta lectura de sus datos, depende el uso de la aplicación"),
                             #Pregunta si los datos tienen encabezado o no
                             
-                            tags$p("¿La base de datos tiene encabezado?"),
+                            #tags$p("¿La base de datos tiene encabezado?"),
                             
-                            checkboxInput("header", "Encabezado", TRUE),
+                            #checkboxInput("header", "Encabezado", TRUE),
+                            prettyCheckbox(
+                              inputId = "header",
+                              label = "Los datos tienen encabezado?", 
+                              value = TRUE,
+                              icon = icon("check"),
+                              status = "info",
+                              animation = "rotate"
+                            ),
                             
                             #Dos opciones en una sola fila
                             
-                            fluidRow(
-                              
-                              #Pregunta el tipo de separador de los datos
-                              column(6,selectInput("sep", "Separador",width = "100%",
-                                                   choices = c("Coma" = ",",
-                                                               "Punto coma" = ";",
-                                                               "Tabular" = "\t"),
-                                                   selected = ",")
-                              ),
-                              #Pregunta el tipo de decimal usado en los datos
-                              column(5,selectInput("dec","Decimal",width = "100%", 
-                                                   choices = c("Punto"=".",
-                                                               "Coma"=","),
-                                                   selected=",")
-                              )
-                              
-                            )
+                            # fluidRow(
+                            #   
+                            #   #Pregunta el tipo de separador de los datos
+                            #   column(6,selectInput("sep", "Separador",width = "100%",
+                            #                        choices = c("Coma" = ",",
+                            #                                    "Punto coma" = ";",
+                            #                                    "Tabular" = "\t"),
+                            #                        selected = ",")
+                            #   ),
+                            #   #Pregunta el tipo de decimal usado en los datos
+                            #   column(5,selectInput("dec","Decimal",width = "100%", 
+                            #                        choices = c("Punto"=".",
+                            #                                    "Coma"=","),
+                            #                        selected=",")
+                            #   )
+                            #   
+                            # ),
+                            conditionalPanel("output.datos==false",
+                                             selectInput(inputId = 'ycol',
+                                                         label = 'Cual es su variable Y?',
+                                                         choices = c("algo"="algo")
+                                                         ),
+                                             selectInput(inputId = 'xcol',
+                                                         label = 'Cual es su variable de tiempo?',
+                                                         choices = c("algo"="algo")
+                                             ),
+                                             tags$p("Listo para calcular?"),
+                                             switchInput(
+                                               inputId = "accion",
+                                               label = "<i class=\"fa fa-thumbs-up\"></i>",
+                                               onLabel = "Si",
+                                               offLabel = "No"
+                                             )
+                                             
+                                             )
                             
                           ),
-                          
-                          # Paneles de salida
                           mainPanel(
+                          conditionalPanel("output.datos==false & input.accion==false",
+                            #"output.datos==true",
+                                  tableOutput("contents")
+                                           #tags$h3("")
+                                           
+                                           ),
+                          conditionalPanel("output.datos==false & input.accion==true",
+                          # Paneles de salida
+                          #mainPanel(
+                            #tableOutput("contents"),
                             #Gráfica 1------------------------------------------------
                             dropdownButton(
                               
@@ -152,7 +187,8 @@ shinyUI(
                             
                             
                             
-                          )
+                          )#Cierra condicional
+                        )#cierra main
                         )
                       )
                       
