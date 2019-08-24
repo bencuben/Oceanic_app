@@ -152,7 +152,7 @@ shinyServer(function(input, output,session) {
                              "Oct","Nov","Dic")) +
       labs(tag = titulo) + 
       theme(plot.tag = element_text(lineheight = 2,face = "bold",size = 20),
-            plot.tag.position = "top")  +
+            plot.tag.position = "top", axis.text.x = element_text(angle = 90))  +
       geom_point(color = "#c72c41")  + geom_line(color = "#c72c41")
     }
     
@@ -186,18 +186,12 @@ shinyServer(function(input, output,session) {
     if(input$accion==TRUE){
     
       datos<-dataset()
-      
-      
       datos2 <- datos[datos[,input$ycol] != -99,input$ycol]
-      
+      datos2 <- as.data.frame(datos2)
       Quant <- data.frame(Probs=seq(0,1,0.0001),
-                          Cuantil_P=quantile(datos2,probs = seq(0,1,0.0001)))
+                          Cuantil_P=quantile(datos2$datos2,probs = seq(0,1,0.0001)))
       
-      Ajuste <- fitDist(y = datos2, type = "realplus",trace=FALSE)
-      
-    
-    
-      
+      Ajuste <- fitDist(y = datos2$datos2, type = "realplus",trace=FALSE)
       
     #eval = Evalua expresiones
     #parse = convierte textos en expresiones sin evaluar
@@ -207,28 +201,33 @@ shinyServer(function(input, output,session) {
                                                 Ajuste$mu,
                                                 ",sigma=",Ajuste$sigma,")")))
     
-    d_0.01 <- round(Quant$Cuantil_P[101],2)
-    d_0.05 <- round(Quant$Cuantil_P[501],2)
-    d_0.95 <- round(Quant$Cuantil_P[9501],2)
-    d_0.99 <- round(Quant$Cuantil_P[9901],2)
+    cuantiles <- round(quantile(Quant$Cuantil_P,c(0.01,0.05,0.95,0.99)),2)
     
     titulo2 <- ifelse(input$titulo2=="",paste("Análisis de extremos: ",Ajuste$family[2]),input$titulo2)
     ejex2 <- ifelse(input$ejex2=="","Datos",input$ejex2)
     ejey2 <- ifelse(input$ejey2=="","Probabilidad acumulada",input$ejey2)
     
-    ggplot(data = Quant) +
-      geom_line(aes(x=Cuantil_P,y=Probs), color = "#FF9770", size=1) +
-      geom_line(aes(x=Cuantil_T,y=Probs), color = "#70D6FF", size=1) +
-      scale_x_continuous(name = ejex2,breaks = seq(0,ceiling(max(datos2)),5)) +
-      scale_y_continuous(name = ejey2) +
-      labs(tag = titulo2) +
+    ggplot(data = Quant) + 
+      geom_line(aes(x = Cuantil_P, y = Probs), color = "#FF9770", size = 1.3) +
+      geom_line(aes(x = Cuantil_T, y = Probs), color = "#70D6FF", size = 1.3) + 
+      scale_x_continuous(name = "X",breaks = seq(0,ceiling(max(datos2$datos2)),5)) +
+      scale_y_continuous(name = "Probability") +
+      labs(tag = paste("Data VS",Ajuste$family[2])) +
       theme(plot.tag = element_text(lineheight = 2,face = "bold",size = 15),
-            plot.tag.position = "top") +
+            plot.tag.position = "top", axis.text.x = element_text(angle = 90)) +
       scale_fill_manual(values = c("#FF9770","#70D6FF")) +
-      geom_text(aes(x=d_0.01,y=0.01),label=d_0.01)+
-      geom_text(aes(x=d_0.05,y=0.05),label=d_0.05)+
-      geom_text(aes(x=d_0.95,y=0.95),label=d_0.95)+
-      geom_text(aes(x=d_0.99,y=0.99),label=d_0.99)
+      geom_line(aes(x = Cuantil_T, y = 0.01), color = "#99b19c", size = 1) +
+      geom_line(aes(x = Cuantil_T, y = 0.05), color = "#99b19c", size = 1) +
+      geom_line(aes(x = Cuantil_T, y = 0.95), color = "#99b19c", size = 1) +
+      geom_line(aes(x = Cuantil_T, y = 0.99), color = "#99b19c", size = 1) +
+      geom_text(aes(x = cuantiles[1], y = 0.01), label = cuantiles[1]) +
+      geom_text(aes(x = cuantiles[2], y = 0.05), label = cuantiles[2]) +
+      geom_text(aes(x = cuantiles[3], y = 0.95), label = cuantiles[3]) +
+      geom_text(aes(x = cuantiles[4], y = 0.99), label = cuantiles[4]) +
+      geom_text(aes(x = 0, y = 0.01), label = "1%") +
+      geom_text(aes(x = 0, y = 0.05), label = "5%") +
+      geom_text(aes(x = 0, y = 0.95), label = "95%") +
+      geom_text(aes(x = 0, y = 0.99), label = "99%")
 
     }
     
@@ -258,28 +257,25 @@ shinyServer(function(input, output,session) {
     if(input$accion==TRUE){
       
       datos<-dataset()
-      
-      
-      
       datos2 <- datos[datos[,input$ycol] != -99,input$ycol]
-      
-      Quant <- data.frame(Probs=seq(0,1,0.0001),
-                          Cuantil_P=quantile(datos2,probs = seq(0,1,0.0001)))
-      
-      Ajuste <- fitDist(y = datos2, type = "realplus",trace=FALSE)
-      
+      datos2 <- as.data.frame(datos2)
+      Ajuste <- fitDist(y = datos2$datos2, type = "realplus",trace=FALSE)
+      datos2$densidad <- eval(parse(text = paste0("d",Ajuste$family[1],"(x = datos2$datos2, mu = ",
+                                                 Ajuste$mu,", sigma = ",Ajuste$sigma,")")))
       
       
   titulo3 <- ifelse(input$titulo3=="",paste("Mejor distribución: :",Ajuste$family[2]),input$titulo3)
   ejex3 <- ifelse(input$ejex3=="","Datos",input$ejex3)
   ejey3 <- ifelse(input$ejey3=="","Densidad",input$ejey3)
 
-  histDist(datos2, family=as.name(Ajuste$family[1]), col.hist = "white",
-           col.main = "Black", line.col = "blue",border.hist = "black",
-           main= titulo3,
-           xlab=ejex3,
-           ylab=ejey3,
-           col.axis = "black", col.lab = "black")
+  ggplot(data = datos2,aes(x = datos2)) + 
+    geom_histogram(aes(y = ..density..),binwidth=density(datos2$datos)$bw, fill = "#70D6FF",
+                   color = "#000000") + 
+    geom_line(aes(y = densidad), colour = "#FF9770", size = 1.3) + 
+    scale_x_continuous(name = "Data") + scale_y_continuous(name = "Density") +
+    labs(tag = paste("Density with distribution",Ajuste$family[2])) +
+    theme(plot.tag = element_text(lineheight = 2,face = "bold",size = 15),
+          plot.tag.position = "top", axis.text.x = element_text(angle = 90))
     }
   })  
   
@@ -329,7 +325,7 @@ shinyServer(function(input, output,session) {
       scale_x_continuous(name = ejex4, breaks = seq(min(MY$Year),max(MY$Year),1)) + 
       labs(tag = titulo4) + 
       theme(plot.tag = element_text(lineheight = 2,face = "bold",size = 20),
-            plot.tag.position = "top")  +
+            plot.tag.position = "top", axis.text.x = element_text(angle = 90))  +
       geom_point(color = "#c72c41") + geom_line(color = "#c72c41")
     }
   })
