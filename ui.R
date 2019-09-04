@@ -198,7 +198,7 @@ shinyUI(
                         column(10,
                         tags$p(tags$h1(style="color:black;font-size:40px;font-weight:bold","Ficha Técnica"), 
                         tags$h3(style="color:black;font-size:30px;font-weight:bold","Utilización 
-                        de R para gráfico de cajas y distribución e los datos")), 
+                        de R para gráfico de cajas y distribución de los datos")), 
                         tags$p(style="color:black;font-size:20px","En las líneas iniciales se propone instalar 
                         los paquetes necesarios para realizar el análisis estadístico, en este caso, los paquetes 
                         son:"), tags$p(tags$li(tags$b(style="color:#FF3567;font-size:20px","lubridate"), 
