@@ -54,24 +54,24 @@ shinyServer(function(input, output,session) {
   reactive({
     if(input$accion==TRUE){
       datos<-dataset()
-      datos1 <- datos[datos[,input$ycol] != -99,c(input$xcol,input$ycol)]
-      datos1$YYYYMM <- ymd(datos1[,input$xcol],truncated = 2)
+      #datos1 <- datos[datos[,input$ycol] != -99,c(input$xcol,input$ycol)]
+      #datos1$YYYYMM <- ymd(datos1[,input$xcol],truncated = 2)
       
-      datos1$Month <- month(datos1[,input$xcol])
-      datos1$Year <- year(datos1[,input$xcol])
-      datos1$Y<-datos1[,input$ycol]
-      datos1 <- datos1[,c("Year","Month","Y")]
+      #datos1$Month <- month(datos1[,input$xcol])
+      #datos1$Year <- year(datos1[,input$xcol])
+      #datos1$Y<-datos1[,input$ycol]
+      #datos1 <- datos1[,c("Year","Month","Y")]
       #Means Year and Month####
-      MY <- datos1 %>% group_by(Year) %>% summarise(medias = mean(Y) )
-      MM <- datos1 %>% group_by(Month) %>% summarise(medias = mean(Y))
+      #MY <- datos1 %>% group_by(Year) %>% summarise(medias = mean(Y) )
+      #MM <- datos1 %>% group_by(Month) %>% summarise(medias = mean(Y))
       
       
-      datos2 <- datos[datos[,input$ycol] != -99,input$ycol]
+      #datos2 <- datos[datos[,input$ycol] != -99,input$ycol]
       
-      Quant <- data.frame(Probs=seq(0,1,0.0001),
-                          Cuantil_P=quantile(datos2,probs = seq(0,1,0.0001)))
+      #Quant <- data.frame(Probs=seq(0,1,0.0001),
+      #                    Cuantil_P=quantile(datos2,probs = seq(0,1,0.0001)))
       
-      Ajuste <- fitDist(y = datos2, type = "realplus",trace=FALSE)
+      #Ajuste <- fitDist(y = datos2, type = "realplus",trace=FALSE)
       
     }
     
@@ -118,7 +118,7 @@ shinyServer(function(input, output,session) {
   plotInput1 <- reactive({
     req(input$file1)
     if(input$accion==TRUE){
-      
+      withProgress( message = "Ajustando Ciclo mensual",value=0,{
       
       datos<-dataset()
       datos1 <- datos[datos[,input$ycol] != -99,c(input$xcol,input$ycol)]
@@ -154,6 +154,7 @@ shinyServer(function(input, output,session) {
       theme(plot.tag = element_text(lineheight = 2,face = "bold",size = 20),
             plot.tag.position = "top", axis.text.x = element_text(angle = 90))  +
       geom_point(color = "#c72c41")  + geom_line(color = "#c72c41")
+      })
     }
     
   })
@@ -184,7 +185,7 @@ shinyServer(function(input, output,session) {
     req(input$file1)
     
     if(input$accion==TRUE){
-    
+      withProgress( message = "Realizando análisis de extremos",value=0,{
       datos<-dataset()
       datos2 <- datos[datos[,input$ycol] != -99,input$ycol]
       datos2 <- as.data.frame(datos2)
@@ -228,6 +229,8 @@ shinyServer(function(input, output,session) {
       geom_text(aes(x = 0, y = 0.05), label = "5%") +
       geom_text(aes(x = 0, y = 0.95), label = "95%") +
       geom_text(aes(x = 0, y = 0.99), label = "99%")
+    
+      })#with progress
 
     }
     
@@ -256,6 +259,9 @@ shinyServer(function(input, output,session) {
     req(input$file1)
     if(input$accion==TRUE){
       
+      withProgress( message = "Ajustando la mejor distribución",value=0,{
+        
+      
       datos<-dataset()
       datos2 <- datos[datos[,input$ycol] != -99,input$ycol]
       datos2 <- as.data.frame(datos2)
@@ -276,8 +282,13 @@ shinyServer(function(input, output,session) {
     labs(tag = paste("Density with distribution",Ajuste$family[2])) +
     theme(plot.tag = element_text(lineheight = 2,face = "bold",size = 15),
           plot.tag.position = "top", axis.text.x = element_text(angle = 90))
+  
+      })#wihtprofgres
+  
     }
-  })  
+  })
+ 
+  
   
   output$plot3<- renderPlot({
     print(plotInput3())
@@ -299,7 +310,7 @@ shinyServer(function(input, output,session) {
     req(input$file1)
     if(input$accion==TRUE){
     
-      
+      withProgress( message = "Ajustando ciclo anual",value=0,{
       datos<-dataset()
       datos1 <- datos[datos[,input$ycol] != -99,c(input$xcol,input$ycol)]
       datos1$YYYYMM <- ymd(datos1[,input$xcol],truncated = 2)
@@ -327,6 +338,9 @@ shinyServer(function(input, output,session) {
       theme(plot.tag = element_text(lineheight = 2,face = "bold",size = 20),
             plot.tag.position = "top", axis.text.x = element_text(angle = 90))  +
       geom_point(color = "#c72c41") + geom_line(color = "#c72c41")
+    
+      })
+    
     }
   })
   

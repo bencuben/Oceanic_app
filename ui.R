@@ -14,6 +14,8 @@ shinyUI(
                       fluidPage(theme=shinytheme("cerulean"),
                         #shinythemes::themeSelector(),
                         setBackgroundImage(src = "oceano.jpg"),
+                        tags$head(tags$style(".shiny-progress {top: 50% !important;left: 50% !important;margin-top: -100px !important;margin-left: -250px !important; color: blue;font-size: 20px;font-style: italic;}")),
+                        
                         
                         sidebarLayout(
                           sidebarPanel(width=4,
@@ -32,7 +34,7 @@ shinyUI(
                                                  ".csv")
                                       
                             ),
-                            tags$p("Recuerde que de la correcta lectura de sus datos, depende el uso de la aplicación"),
+                            tags$p("Cargue su base de datos y luego seleccione las variables a analizar"),
                             #Pregunta si los datos tienen encabezado o no
                             
                             #tags$p("¿La base de datos tiene encabezado?"),
@@ -89,6 +91,8 @@ shinyUI(
                           mainPanel(
                           conditionalPanel("output.datos==false & input.accion==false",
                             #"output.datos==true",
+                            tags$p("Recuerde que de la correcta lectura de sus datos, depende el uso de la aplicación"),
+                            
                                   tableOutput("contents")
                                            #tags$h3("")
                                            
