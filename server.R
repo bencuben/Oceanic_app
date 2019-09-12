@@ -138,7 +138,7 @@ shinyServer(function(input, output,session) {
       
       
       
-    titulo <- ifelse(input$titulo1=="","Ciclo Mensual",input$titulo1)
+    titulo <- ifelse(input$titulo1=="","Ciclo anual",input$titulo1)
     ejex <- ifelse(input$ejex1=="","Mes",input$ejex1)
     ejey <- ifelse(input$ejey1=="","Altura",input$ejey1)
     
@@ -325,7 +325,7 @@ shinyServer(function(input, output,session) {
       
       
     
-    titulo4 <- ifelse(input$titulo4=="","Ciclo anual",input$titulo4)
+    titulo4 <- ifelse(input$titulo4=="","Medias anuales",input$titulo4)
     ejex4 <- ifelse(input$ejex4=="","Año",input$ejex4)
     ejey4 <- ifelse(input$ejey4=="","Altura",input$ejey4)
     
