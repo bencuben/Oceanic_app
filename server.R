@@ -1,3 +1,4 @@
+#Librerias usadas
 
 library(lubridate)
 library(dplyr)
@@ -7,30 +8,7 @@ library(shiny)
 library(shinythemes)
 library(gamlss)
 
-# #Open file####
-# #68 lineas inservibles 
-# datos <- read.table("www/AirSea_ST_0001.asc", skip = 68,header = T)
-# #Fix the base####
-# datos1 <- datos[datos$SSH != -99,c("YYYYMM","SSH")]
-# datos1$YYYYMM <- ymd(datos1$YYYYMM,truncated = 2)
-# datos1$Month <- month(datos1$YYYYMM)
-# datos1$Year <- year(datos1$YYYYMM)
-# datos1 <- datos1[,c("Year","Month","SSH")]
-# #Means Year and Month####
-# MY <- datos1 %>% group_by(Year) %>% summarise(medias = mean(SSH))
-# MM <- datos1 %>% group_by(Month) %>% summarise(medias = mean(SSH))
-# 
-# 
-# datos2 <- datos[datos$SSH != -99,c("SSH")]
 
-
-
-
-
-
-
-
-# Define server logic required to draw a histogram
 shinyServer(function(input, output,session) {
    
 
@@ -54,25 +32,7 @@ shinyServer(function(input, output,session) {
   reactive({
     if(input$accion==TRUE){
       datos<-dataset()
-      #datos1 <- datos[datos[,input$ycol] != -99,c(input$xcol,input$ycol)]
-      #datos1$YYYYMM <- ymd(datos1[,input$xcol],truncated = 2)
-      
-      #datos1$Month <- month(datos1[,input$xcol])
-      #datos1$Year <- year(datos1[,input$xcol])
-      #datos1$Y<-datos1[,input$ycol]
-      #datos1 <- datos1[,c("Year","Month","Y")]
-      #Means Year and Month####
-      #MY <- datos1 %>% group_by(Year) %>% summarise(medias = mean(Y) )
-      #MM <- datos1 %>% group_by(Month) %>% summarise(medias = mean(Y))
-      
-      
-      #datos2 <- datos[datos[,input$ycol] != -99,input$ycol]
-      
-      #Quant <- data.frame(Probs=seq(0,1,0.0001),
-      #                    Cuantil_P=quantile(datos2,probs = seq(0,1,0.0001)))
-      
-      #Ajuste <- fitDist(y = datos2, type = "realplus",trace=FALSE)
-      
+     
     }
     
   })
@@ -101,7 +61,7 @@ shinyServer(function(input, output,session) {
     }else{
       FALSE
     }
-    #is.null(dataset())
+   
 
   })
   
@@ -118,7 +78,7 @@ shinyServer(function(input, output,session) {
   plotInput1 <- reactive({
     req(input$file1)
     if(input$accion==TRUE){
-      withProgress( message = "Ajustando Ciclo mensual",value=0,{
+      withProgress( message = "Ajustando Ciclo Anual",value=0,{
       
       datos<-dataset()
       datos1 <- datos[datos[,input$ycol] != -99,c(input$xcol,input$ycol)]
@@ -138,9 +98,15 @@ shinyServer(function(input, output,session) {
       
       
       
+<<<<<<< HEAD
     titulo <- ifelse(input$titulo1=="","Annual cycle",input$titulo1)
     ejex <- ifelse(input$ejex1=="","Month",input$ejex1)
     ejey <- ifelse(input$ejey1=="","Height",input$ejey1)
+=======
+    titulo <- ifelse(input$titulo1=="","Ciclo anual",input$titulo1)
+    ejex <- ifelse(input$ejex1=="","Mes",input$ejex1)
+    ejey <- ifelse(input$ejey1=="",input$ycol,input$ejey1)
+>>>>>>> 6efadc9d31ce1962950f74a1a3d77f228131528f
     
     
     ggplot(data = MM, aes(x=Month, y=medias)) + theme_minimal() +
@@ -148,11 +114,16 @@ shinyServer(function(input, output,session) {
                    fill = "#aee7e8", outlier.color = "#24009c") + 
       scale_y_continuous(name = ejey) + 
       scale_x_continuous(name = ejex, breaks = 1:12 , labels = 
-                           c("Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Sep",
-                             "Oct","Nov","Dic")) +
+                           c("1","2","3","4","5","6","7","8","9",
+                             "10","11","12")) +
       labs(tag = titulo) + 
+<<<<<<< HEAD
       theme(plot.tag = element_text(lineheight = 4,face = "bold",size = 20, hjust = 0.5),
             plot.tag.position = "top", axis.text.x = element_text(angle = 90))  +
+=======
+      theme(plot.tag = element_text(lineheight = 2,face = "bold",size = 20),
+            plot.tag.position = "top", axis.text.x = element_text(angle = 0))  +
+>>>>>>> 6efadc9d31ce1962950f74a1a3d77f228131528f
       geom_point(color = "#c72c41")  + geom_line(color = "#c72c41")
       })
     }
@@ -204,17 +175,28 @@ shinyServer(function(input, output,session) {
     
     cuantiles <- round(quantile(Quant$Cuantil_P,c(0.01,0.05,0.95,0.99)),2)
     
+<<<<<<< HEAD
     titulo2 <- ifelse(input$titulo2=="",paste("Analysis of extremes: ",Ajuste$family[2]),input$titulo2)
     ejex2 <- ifelse(input$ejex2=="","Data",input$ejex2)
     ejey2 <- ifelse(input$ejey2=="","Cumulative probability",input$ejey2)
+=======
+    titulo2 <- ifelse(input$titulo2=="",paste("Análisis de extremos: ",Ajuste$family[2]),input$titulo2)
+    ejex2 <- ifelse(input$ejex2=="",input$ycol,input$ejex2)
+    ejey2 <- ifelse(input$ejey2=="","Probabilidad",input$ejey2)
+>>>>>>> 6efadc9d31ce1962950f74a1a3d77f228131528f
     
     ggplot(data = Quant) +  theme_minimal() +
       geom_line(aes(x = Cuantil_P, y = Probs), color = "#FF9770", size = 1.3) +
       geom_line(aes(x = Cuantil_T, y = Probs), color = "#70D6FF", size = 1.3) + 
       scale_x_continuous(name = ejex2,breaks = seq(0,ceiling(max(datos2$datos2)),5)) +
       scale_y_continuous(name = ejey2) +
+<<<<<<< HEAD
       labs(tag = titulo2) +
       theme(plot.tag = element_text(lineheight = 4,face = "bold",size = 15, hjust = 0.5),
+=======
+      labs(tag = paste(input$ycol," vs ",Ajuste$family[2])) +
+      theme(plot.tag = element_text(lineheight = 2,face = "bold",size = 15),
+>>>>>>> 6efadc9d31ce1962950f74a1a3d77f228131528f
             plot.tag.position = "top", axis.text.x = element_text(angle = 90)) +
       scale_fill_manual(values = c("#FF9770","#70D6FF")) +
       geom_line(aes(x = Cuantil_T, y = 0.01), color = "#99b19c", size = 1) +
@@ -271,17 +253,30 @@ shinyServer(function(input, output,session) {
                                                  Ajuste$mu,", sigma = ",Ajuste$sigma,")")))
       
       
+<<<<<<< HEAD
   titulo3 <- ifelse(input$titulo3=="",paste("Best distribution :",Ajuste$family[2]),input$titulo3)
   ejex3 <- ifelse(input$ejex3=="","Data",input$ejex3)
   ejey3 <- ifelse(input$ejey3=="","Density",input$ejey3)
+=======
+  titulo3 <- ifelse(input$titulo3=="",paste("Mejor distribución: :",Ajuste$family[2]),input$titulo3)
+  ejex3 <- ifelse(input$ejex3=="",input$ycol,input$ejex3)
+  ejey3 <- ifelse(input$ejey3=="","Densidad",input$ejey3)
+>>>>>>> 6efadc9d31ce1962950f74a1a3d77f228131528f
 
   ggplot(data = datos2,aes(x = datos2)) + theme_minimal() +
     geom_histogram(aes(y = ..density..),binwidth=density(datos2$datos)$bw, fill = "#70D6FF",
                    color = "#000000") + 
     geom_line(aes(y = densidad), colour = "#FF9770", size = 1.3) + 
+<<<<<<< HEAD
     scale_x_continuous(name = ejex3) + scale_y_continuous(name = ejey3) +
     labs(tag = titulo3) +
     theme(plot.tag = element_text(lineheight = 4,face = "bold",size = 15, hjust = 0.5),
+=======
+    scale_x_continuous(name = ejex3) +
+    scale_y_continuous(name = ejey3) +
+    labs(tag = paste("Mejor Distribución: ",Ajuste$family[2])) +
+    theme(plot.tag = element_text(lineheight = 2,face = "bold",size = 15),
+>>>>>>> 6efadc9d31ce1962950f74a1a3d77f228131528f
           plot.tag.position = "top", axis.text.x = element_text(angle = 90))
   
       })#wihtprofgres
@@ -311,7 +306,7 @@ shinyServer(function(input, output,session) {
     req(input$file1)
     if(input$accion==TRUE){
     
-      withProgress( message = "Ajustando ciclo anual",value=0,{
+      withProgress( message = "Medias Anuales",value=0,{
       datos<-dataset()
       datos1 <- datos[datos[,input$ycol] != -99,c(input$xcol,input$ycol)]
       datos1$YYYYMM <- ymd(datos1[,input$xcol],truncated = 2)
@@ -326,9 +321,15 @@ shinyServer(function(input, output,session) {
       
       
     
+<<<<<<< HEAD
     titulo4 <- ifelse(input$titulo4=="","Annual averages",input$titulo4)
     ejex4 <- ifelse(input$ejex4=="","Year",input$ejex4)
     ejey4 <- ifelse(input$ejey4=="","Height",input$ejey4)
+=======
+    titulo4 <- ifelse(input$titulo4=="","Medias anuales",input$titulo4)
+    ejex4 <- ifelse(input$ejex4=="","Año",input$ejex4)
+    ejey4 <- ifelse(input$ejey4=="",input$ycol,input$ejey4)
+>>>>>>> 6efadc9d31ce1962950f74a1a3d77f228131528f
     
     ggplot(data = MY, aes(x=Year, y=medias)) + theme_minimal() +
       geom_boxplot(data = datos1,aes(x=Year,y=Y,group=Year), 
