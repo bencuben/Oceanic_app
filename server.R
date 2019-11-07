@@ -125,6 +125,10 @@ shinyServer(function(input, output,session) {
         datos1 <- datos[datos[,input$ycol] != -99,c(input$xcol,input$ycol)]
         datos1$YYYYMM <- ymd(datos1[,input$xcol],truncated = 2)
         
+        titulo <- ifelse(input$titulo1=="","Annual cycle",input$titulo1)
+        ejex <- ifelse(input$ejex1=="",names(datos1)[1],input$ejex1)
+        ejey <- ifelse(input$ejey1=="",names(datos1)[2],input$ejey1)
+        
         datos1$Month <- month(datos1[,input$xcol])
         datos1$Year <- year(datos1[,input$xcol])
         datos1$Y<-datos1[,input$ycol]
@@ -133,24 +137,13 @@ shinyServer(function(input, output,session) {
         MY <- datos1 %>% group_by(Year) %>% summarise(medias = mean(Y) )
         MM <- datos1 %>% group_by(Month) %>% summarise(medias = mean(Y))
         
-        
-        
-        
-        
-        
-        
-        titulo <- ifelse(input$titulo1=="","Annual cycle",input$titulo1)
-        ejex <- ifelse(input$ejex1=="","Month",input$ejex1)
-        ejey <- ifelse(input$ejey1=="","Height",input$ejey1)
-        
-        
         ggplot(data = MM, aes(x=Month, y=medias)) + theme_minimal() +
           geom_boxplot(data = datos1,aes(x=Month,y=Y,group=Month), 
                        fill = "#aee7e8", outlier.color = "#24009c") + 
           scale_y_continuous(name = ejey) + 
           scale_x_continuous(name = ejex, breaks = 1:12 , labels = 
-                               c("Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Sep",
-                                 "Oct","Nov","Dic")) +
+                               c("Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep",
+                                 "Oct","Nov","Dec")) +
           labs(tag = titulo) + 
           theme(plot.tag = element_text(lineheight = 4,face = "bold",size = 20, hjust = 0.5),
                 plot.tag.position = "top", axis.text.x = element_text(angle = 90))  +
@@ -206,7 +199,7 @@ shinyServer(function(input, output,session) {
         cuantiles <- round(quantile(Quant$Cuantil_P,c(0.01,0.05,0.95,0.99)),2)
         
         titulo2 <- ifelse(input$titulo2=="",paste("Analysis of extremes: ",Ajuste$family[2]),input$titulo2)
-        ejex2 <- ifelse(input$ejex2=="","Data",input$ejex2)
+        ejex2 <- ifelse(input$ejex2=="","Response",input$ejex2)
         ejey2 <- ifelse(input$ejey2=="","Cumulative probability",input$ejey2)
         
         ggplot(data = Quant) +  theme_minimal() +
@@ -273,7 +266,7 @@ shinyServer(function(input, output,session) {
         
         
         titulo3 <- ifelse(input$titulo3=="",paste("Best distribution :",Ajuste$family[2]),input$titulo3)
-        ejex3 <- ifelse(input$ejex3=="","Data",input$ejex3)
+        ejex3 <- ifelse(input$ejex3=="","Response",input$ejex3)
         ejey3 <- ifelse(input$ejey3=="","Density",input$ejey3)
         
         ggplot(data = datos2,aes(x = datos2)) + theme_minimal() +
@@ -317,6 +310,10 @@ shinyServer(function(input, output,session) {
         datos1 <- datos[datos[,input$ycol] != -99,c(input$xcol,input$ycol)]
         datos1$YYYYMM <- ymd(datos1[,input$xcol],truncated = 2)
         
+        titulo4 <- ifelse(input$titulo4=="","Annual averages",input$titulo4)
+        ejex4 <- ifelse(input$ejex4=="",names(datos1)[1],input$ejex4)
+        ejey4 <- ifelse(input$ejey4=="",names(datos1)[2],input$ejey4)
+        
         datos1$Month <- month(datos1[,input$xcol])
         datos1$Year <- year(datos1[,input$xcol])
         datos1$Y<-datos1[,input$ycol]
@@ -325,11 +322,6 @@ shinyServer(function(input, output,session) {
         MY <- datos1 %>% group_by(Year) %>% summarise(medias = mean(Y) )
         MM <- datos1 %>% group_by(Month) %>% summarise(medias = mean(Y))
         
-        
-        
-        titulo4 <- ifelse(input$titulo4=="","Annual averages",input$titulo4)
-        ejex4 <- ifelse(input$ejex4=="","Year",input$ejex4)
-        ejey4 <- ifelse(input$ejey4=="","Height",input$ejey4)
         
         ggplot(data = MY, aes(x=Year, y=medias)) + theme_minimal() +
           geom_boxplot(data = datos1,aes(x=Year,y=Y,group=Year), 
